@@ -1,0 +1,10 @@
+default: &default
+  adapter: mysql2
+  user: root
+  database: cryptofresh
+
+development:
+  <<: *default
+
+production:
+  <<: *default

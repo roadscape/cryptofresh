@@ -1,0 +1,64 @@
+<style>
+#product_list .jumbotron {padding: 24px 30px;}
+#product_list h2 a {color: inherit;}
+#product_list h2 {margin-top: 0;}
+#product_list h3 {margin-top: 0;}
+#product_list p {font-size: 1.2em;}
+#product_list div.text {min-height: 90px;}
+#product_list .image {width: 200px; height: 200px; border: 1px solid #fff; position: relative; background: white;}
+#product_list .image img {max-height: 100%; max-width: 100%; margin: 0 auto; display: block;}
+#product_list .image .bg {position: absolute; top: 0; right: 0; width: 100%; height: 100%; z-index: 10; box-shadow: -3px -6px 40px -10px #ddd inset;}
+</style>
+
+
+<div id="product_list">
+
+  <% @products.each do |p| %>
+    <div class="jumbotron">
+      <div class="row">
+        <div class="col-sm-4 col-md-3">
+          <div class="image">
+            <%= link_to image_tag(p.image.url(:medium)), p %>
+            <%= link_to "", p, :class => 'bg' %>
+          </div>
+        </div>
+
+        <div class="col-sm-8 col-md-9">
+          <h2><%= link_to p.name, p %></h2>
+          <div class="text">
+            <%= p.short_desc.html_safe %>
+          </div>
+          <span class="pull-right <%= "bts-text-#{session[:asset].downcase}" %>">
+            <% cheapest = p.children.sort_by{|c| c.cents}.first %>
+            <big><%= p.children.size > 1 ? 'Starting at' : '' %> <%= local_price(cheapest, true) %></big>
+          </span>
+          <p><%= link_to (!p.button_label.blank? ? p.button_label : 'Check it out &rarr;'.html_safe), p, :class => 'btn btn-primary xbtn-lg' %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="jumbotron">
+    <div class="row">
+      <div class="col-sm-4 col-md-3">
+        <div class="image">
+          <%= image_tag "/mystery.jpg" %>
+          <div class="bg"></div>
+        </div>
+      </div>
+
+      <div class="col-sm-8 col-md-9">
+        <h3>More coming soon</h3>
+        <br />
+        <p>More BitShares swag will be here soon!</p>
+        <br />
+        For updates check <a href="https://bitsharestalk.org/">BitSharesTalk</a>, or sign up below:<br />
+        <%= form_for :subscription, :url => subscribe_products_url, :html => {:class => 'form-inline', :role => 'form'} do |f| %>
+          <%= f.text_field :email, :size => 32, :placeholder => "satoshi@gmail.com", :class => 'form-control' %> 
+          <%= f.submit "Get updates", :class => 'btn btn-primary' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+</div>

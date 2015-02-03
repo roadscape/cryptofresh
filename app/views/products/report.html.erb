@@ -1,0 +1,93 @@
+<h3>Transactions</h3>
+<table class="table table-bordered" style="font-size: 9pt;">
+  <tr>
+    <td>trx</td>
+    <td>block</td>
+    <td>date</td>
+    <td>amount</td>
+    <td align="center">from &rarr; to</td>
+    <td>status</td>
+    <td>memo</td>
+    <td>tx fee</td>
+    <td>expires</td>
+  </tr>
+
+<% 
+
+ids = Hash[Order.all.map{|o| [o.pub_id, o]}]
+Tx.all.sort_by{|tx| tx.block_num}.reverse.each do |tx| 
+  tx = Wallet.clean_tx(JSON.parse(tx.json)).first
+  id = ids.keys.find{|i| tx['memo'].include?(i)}
+  o  = id ? ids[id] : nil
+  status = case
+    when !o then ""
+    when (Amount.from_bts(tx['amount']).includes?(o.amount) rescue false)  then "PAID"
+    else "INVALID"
+  end
+  paid = status == "PAID"
+%>
+  <tr>
+    <td><%= tx['trx_id'][0..8] %></td>
+    <td><%= tx['block_num'] %></td>
+    <td><%= tx['date'] %></td>
+    <td><%= Amount.from_bts(tx['amount']).short %></td>
+    <td align="right"><%= "#{tx['from'].gsub('cashier as cashier', 'cashier')} &rarr; #{tx['to']}".gsub(Wallet::ACCT, "<strong>\\0</strong>").html_safe %></td>
+    <% memo = tx['memo'] %>
+    <% memo = o ? memo.gsub(o.pub_id, "<strong style=\"color: #080; font-weight: normal;\">\\0</strong>") : "#{memo} <strong style=\"color: #C00;\"></strong>" %>
+    <td align="center"><%= (paid ? "<strong style=\"color: #080;\">PAID</strong>" : "<strong style=\"color: #C00; font-weight: normal;\">invalid</strong>").html_safe %>
+    <td><%= memo.html_safe %></td>
+    <td><%= Amount.from_bts(tx['fee']).short %></td>
+    <td><%= tx['expires'] %></td>
+  </tr>
+
+<% end %>
+</table>
+
+<br />
+<hr />
+
+<h3>Orders</h3>
+
+<%= DateTime.now %>
+<table class="table table-bordered" style="font-size: 9pt;">
+  <thead>
+    <tr>
+      <td>id</td>
+      <td>ID</td>
+      <td>product</td>
+      <td>price</td>
+      <td>paid?</td>
+      <td>paid by</td>
+      <td>created</td>
+      <td>shipping</td>
+      <td>ip, referer</td>
+    </tr>
+  </thead>
+<% Order.all.order('created_at DESC').reject{|o| o.due_at < 24.hours.ago && !o.paid?}.each do |o| %>
+  <%
+    status = case
+      when o.paid?    then ''
+      when o.expired? then 'Expired'
+      else "DUE in #{((o.due_at - DateTime.now)/60).round(1)}m"
+    end
+  %>
+  <tr>
+    <td><%= o.id %></td>
+    <td><%= o.pub_id %></td>
+    <td><%= "<small><strong>#{o.product.root.name}</strong></small><br/>#{o.product.name}</small>".html_safe rescue 'Unknown' %></td>
+    <td><%= o.amount.short rescue '??' %></td>
+    <td>
+      <%= o.paid_at.strftime("%Y-%m-%d %H:%M") rescue '' %>
+      <%= status %>
+    </td>
+    <% tx = Tx.where(:trx_id => o.trx_id).first %>
+    <td><%= (tx ? Wallet.clean_tx(JSON::parse(tx.json)).first['from'] : '') %></td>
+    <td><%= o.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+    <td><%= h(o.address).gsub("\n","<br />").html_safe %></td>
+    <td><small><%= o.ip %></small><br /><%= o.referrer_acct %></td>
+  </tr>
+<% end %>
+
+</table>
+
+

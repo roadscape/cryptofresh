@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title><%= @page_title || 'cryptofresh' %></title>
+   <meta name="viewport" content="width=device-width, initial-scale=0.5">
+  <%= stylesheet_link_tag    'application', media: 'all' %>
+  <%= javascript_include_tag 'application' %>
+  <%= csrf_meta_tags %>
+
+<style>
+header           {padding: 15px 0 10px;}
+header .text-muted {font-style: italic; font-size: 15px; color: #AAA;}
+footer           {padding: 0 2em 1.5em; color: #AAA; text-align: left;}
+#delegate {float: right;}
+#delegate a       {float: ight; font-size: 12px; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; opacity: 0.9;}
+#delegate a:hover  {opacity: 1;}
+#launch          {border-radius: 10px; box-shadow: inset 0 0 20px rgba(0,0,0,0.25); margin-bottom: 20px; position: relative; margin: 1% 0 2%;}
+#launch          {background: #5e7598 url(/launch3.jpg) 0 0; padding: 5% 0 4%;}
+#launch.mini     {padding: 0.2% 0; margin: 2% 0 3%;}
+#launch.mini #logo {line-height: 80%;}
+#launch.mini #fl {opacity: 0.5;}
+#launch.mini #tag {xbackground-color: rgba(249,242,244,0.5); opacity: 0.8;}
+#launch #fl      {position: absolute; width: 100%; height: 100%; top: 0; left: 0; background: url(/bts-white-sm.png) 98% 93% no-repeat;}
+#logo, #tag      {display: inline-block; vertical-align: middle;}
+#logo            {font-size: 57px; margin: 0.25em 0 0.25em 0.55em; border-right: 4px solid white; padding-right: 0.4em; color: rgba(255,255,255,0.9);}
+#tag             {background-color: rgba(249,242,244,0.7); color: #080; font-size: 23px; padding-left: 10px; margin-left: 1.3em;}
+#tag .inv        {color: #ccc; background: #383;}
+
+.asset           {padding: 3px; color: white !important; display: inline-block; font-size: 14px; border-radius: 3px; margin-right: 12px; letter-spacing: 0.05em; min-width: 100px;}
+.asset .ico      {display: inline-block; width: 22px; height: 24px; background: url(/bts-22x24.png); vertical-align: middle; margin-right: 6px; border-radius: 2px;}
+.asset .lbl      {display: inline-block; vertical-align: middle;}
+a.asset          {opacity: 0.43; border: 1px solid #888; text-decoration: none;}
+a.asset:hover, 
+span.asset       {opacity: 1; box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75); border: 1px solid #555;}
+
+.bts-bg-usd      {background-color: #9bc63f;}
+.bts-bg-cny      {background-color: #d6595e;}
+.bts-bg-gold     {background-color: #d2bd43;}
+.bts-bg-silver   {background-color: #a1b4b7;}
+.bts-bg-eur      {background-color: #398abe;}
+.bts-bg-bts      {background-color: #3ba4db;}
+
+.bts-text-usd    {color: #9bc63f;}
+.bts-text-cny    {color: #d6595e;}
+.bts-text-gold   {color: #d2bd43;}
+.bts-text-silver {color: #a1b4b7;}
+.bts-text-eur    {color: #398abe;}
+.bts-text-bts    {color: #3ba4db;}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div id="delegate">
+      <a href="bts:provisional.bitscape/approve" class="btn btn-danger">wallet_approve provisional.bitscape</a>
+    </div>
+    <% ['USD', 'CNY', 'GOLD', 'SILVER', 'EUR'].each do |asset| %>
+      <% classes = "asset bts-bg-#{asset.downcase}" %>
+      <% name = "<span class=\"ico\"></span><span class=\"lbl\">#{asset == 'BTS' ? 'BTS' : 'Bit'+asset}</span>".html_safe %>
+      <%= link_to_unless(asset == session[:asset], name, "?asset=#{asset}", :class => classes){"<span class=\"#{classes}\">#{name}</span>".html_safe} %>
+    <% end %>
+    <span class="text-muted">proudly accepted <!-- 自豪地接受。--></span>
+  </header>
+
+  <% flash.each do |type, message| %>
+    <div class="alert <%= bootstrap_class_for(type) %> fade in">
+      <button class="close" data-dismiss="alert">×</button>
+      <%= message %>
+    </div>
+  <% end %>
+
+  <% cls = (params[:controller] == 'products' && params[:action] == 'index') ? "" : " mini" %>
+  <div class="jumbotron<%= cls %>" id="launch">
+    <a href="/" id="logo">cryptofresh</a>
+    <code id="tag"># tangible assets for the blockchain age. <span class="inv">&nbsp;</span>&nbsp;</code>
+    <a id="fl" href="/"></a>
+  </div>
+  <script>var i = 0, inv = setInterval(function(){$('#tag span').toggleClass('inv'); if(i++ >6) clearInterval(inv)}, 700);</script>
+
+  <%= yield %>
+
+  <hr>
+  <footer>
+    <span>
+      from <a href="http://bitscape.io" style="line-height: 40px; font-size: 16px;">bitscape</a> with love
+    </span>
+  </footer>
+
+</div>
+
+<% unless root_url.include?('test.') %>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-58152100-2', 'auto');
+  ga('send', 'pageview');
+</script>
+<% end %>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+{
+  "category": "General Methods",
+  "methods" :
+    [
+      {
+        "method_name": "about",
+        "description": "Returns version number and associated information for this client",
+        "return_type": "json_object",
+        "parameters" : [],
+        "is_const"   : true,
+        "prerequisites" : ["no_prerequisites"]
+      },
+      {
+        "method_name": "get_info",
+        "description": "Returns version number and associated information for this client",
+        "return_type": "json_object",
+        "parameters" : [],
+        "is_const"   : true,
+        "prerequisites" : ["no_prerequisites"],
+        "aliases" : ["getinfo","info"]
+      },
+      {
+        "method_name": "stop",
+        "description": "shut down the RPC server and exit this client",
+        "return_type": "void",
+        "parameters" : [],
+        "prerequisites" : ["json_authenticated"],
+        "aliases" : ["quit","exit"]
+      },
+      {
+        "method_name": "help",
+        "description": "display a list of commands, or detailed help on an individual command",
+        "return_type": "string",
+        "parameters" :
+          [
+            {
+              "name" : "command_name",
+              "type" : "method_name",
+              "description" : "the name of the method to get detailed help, or omit this for a list of commands",
+              "default_value" : ""
+            }
+          ],
+        "is_const"   : true,
+        "prerequisites" : ["no_prerequisites"],
+        "aliases" : ["h"]
+      },
+      {
+        "method_name": "validate_address",
+        "description": "Return information about given BitShares address",
+        "return_type": "json_object",
+        "parameters" :
+          [
+            {
+              "name" : "address",
+              "type" : "string",
+              "description" : "the address or public key to validate"
+            }
+          ],
+        "is_const"   : true,
+        "prerequisites" : ["no_prerequisites"],
+        "aliases" : ["validateaddress"]
+      },
+      {
+        "method_name": "execute_command_line",
+        "description": "Execute the given command as if it were typed on the CLI",
+        "return_type": "string",
+        "parameters" :
+          [
+            {
+              "name" : "input",
+              "type" : "passphrase",
+              "description" : "The entire command input as if it were a CLI input"
+            }
+          ],
+        "is_const"   : true,
+        "prerequisites" : ["json_authenticated"]
+      },
+      {
+        "method_name": "execute_script",
+        "description": "Execute the given file as if it were typed on the CLI",
+        "return_type": "void",
+        "parameters" :
+          [
+            {
+              "name" : "script",
+              "type" : "filename",
+              "description" : "Name of a file containing CLI commands to execute",
+	      "example" : "/path/to/script_file.log"
+            }
+          ],
+        "is_const"   : true,
+        "prerequisites" : ["json_authenticated"]
+      },
+      {
+         "method_name": "batch",
+         "description": "Takes any command and an array of its arguments and returns an array of results. Example: batch blockchain_get_blockhash [[1], [2]]",
+         "return_type": "variants",
+         "parameters" :
+         [
+         {
+            "name" : "method_name",
+            "type" : "string",
+            "description" : "The command name for calling"
+         },
+         {
+            "name" : "parameters_list",
+            "type" : "parameters_list",
+            "description" : "The list of list of parameters for this command, the return will be the list of execute result of corresponding parameters"
+         }
+         ],
+         "is_const"   : true,
+         "prerequisites" : ["json_authenticated"]
+      },
+      {
+        "method_name": "meta_help",
+        "description": "Returns help information as JSON data",
+        "return_type": "method_map_type",
+        "parameters" : [],
+        "is_const"   : true,
+        "prerequisites" : ["no_prerequisites"]
+      },
+      {
+        "method_name" : "rpc_set_username",
+        "description" : "Set the username for basic auth for the http server.",
+        "return_type" : "void",
+        "parameters"  :
+          [
+            {
+              "name"          : "username",
+              "description"   : "Username for basic auth",
+              "type"          : "string",
+              "default_value" : ""
+            }
+          ],
+        "is_const"   : false,
+        "prerequisites" : ["json_authenticated"]
+      },
+      {
+        "method_name" : "rpc_set_password",
+        "description" : "Set the password for basic auth for the http server.",
+        "return_type" : "void",
+        "parameters"  :
+          [
+            {
+              "name"          : "password",
+              "description"   : "Password for basic auth",
+              "type"          : "passphrase",
+              "default_value" : ""
+            }
+          ],
+        "is_const"   : false,
+        "prerequisites" : ["json_authenticated"]
+      },
+      {
+        "method_name" : "rpc_start_server",
+        "description" : "Set the port and start rpc server.",
+        "return_type" : "void",
+        "parameters"  :
+          [
+            {
+              "name"          : "port",
+              "description"   : "Port for rpc server",
+              "type"          : "uint32_t",
+              "default_value" : "65065"
+            }
+          ],
+        "is_const"   : false,
+        "prerequisites" : ["json_authenticated"]
+      },
+      {
+        "method_name" : "http_start_server",
+        "description" : "Set the port and start http server.",
+        "return_type" : "void",
+        "parameters"  :
+          [
+            {
+              "name"          : "port",
+              "description"   : "Port for http server",
+              "type"          : "uint32_t",
+              "default_value" : "65066"
+            }
+          ],
+        "is_const"   : false,
+        "prerequisites" : ["json_authenticated"]
+      },
+      {
+        "method_name" : "ntp_update_time",
+        "description" : "Update the NTP time right now.",
+        "return_type" : "void",
+        "parameters"  : [],
+        "is_const"   : false,
+        "prerequisites" : ["json_authenticated"]
+      },
+      {
+        "method_name" : "disk_usage",
+        "description" : "Report disk space taken up by different groups of client files",
+        "return_type" : "variant",
+        "parameters"  : [],
+        "is_const"   : true,
+        "prerequisites" : ["json_authenticated"],
+        "aliases" : ["size", "sizes", "usage", "diskusage"]
+      }
+    ]
+}

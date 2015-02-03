@@ -1,0 +1,133 @@
+<%= form_for @product, :html => {:role => 'form', :style => "width: 800px;", :multipart => true} do |f| %>
+
+    <% if @product.errors.any? %>
+      <strong style="color: #C00;">Oops!</strong>
+      <ul>
+        <% @product.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+<!--
+  <%# TODO: Implement this! %>
+  <div class="form-group">
+    <%= f.label :node_type %><br />
+    <%= f.select :node_type, {"Category (Container for products)" => "Category", "Product" => "Product", "Product Variant" => "Variant"}, :include_blank => true %>
+  </div>
+-->
+
+  <div class="form-group">
+    <%= f.label :name %><br />
+    <%= f.text_field :name, :size => 40, :class => 'xform-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :parent_id, "Parent/Category" %><br />
+    <%= f.select :parent_id, Product.all.reject{|p| p.depth > 0}.map{|p| [p.name, p.id]}, :include_blank => "(top-level)" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :position, "Sort order (1..n)" %><br />
+    <%= f.text_field :position %>
+  </div>
+
+
+
+
+
+
+  <% if @product.root? %>
+
+
+
+
+
+
+    <div class="form-group">
+      <%= f.label :button_label %><br />
+      <%= f.text_field :button_label %>
+    </div>
+    <div class="form-group">
+      <%= f.label :short_desc, "Short Description (HTML)" %><br />
+      <%= f.text_area :short_desc, :class => 'xform-control', :rows => 3, :cols => 100 %>
+    </div>
+    <div class="form-group">
+      <%= f.label :desc, "Description (HTML)" %><br />
+      <%= f.text_area :desc, :class => 'xform-control', :rows => 6, :cols => 100 %>
+    </div>
+
+    <div class="well"> 
+      <div class="form-group">
+        <%= f.label :image %>
+        <%= f.file_field :image, :class => 'form-control' %>
+      </div>
+      <% if @product.image.exists? %>
+        <%= image_tag @product.image(:thumb), :class => 'img-thumbnail' %> this is the front page/feature image. if you upload another it gets replaced.
+      <% end %>
+    </div>
+
+    <% [1, 5-@product.photos.size].max.times{@product.photos.build} %>
+
+    <div class="well" style="height: 100%; overflow: hidden;"> 
+      <%= f.label :photos %><br />
+      <%= f.fields_for :photos do |f2| %>
+        <div style="float: left; width: 140px; height: 130px; text-align: center; margin: 2px;" class="img-thumbnail">
+          <% if f2.object.image.exists? %>
+            <div style="width: 100px; height: 100px; background: #EEE; display: inline-block;">
+              <%= image_tag f2.object.image(:thumb), :class => 'img-thumbnails' %>
+            </div><br />
+            <%= f2.check_box :_destroy %> Destroy?
+          <% else %>
+            <div style="width: 100px; height: 75px; background: #EEE; display: inline-block;"></div>
+            <%= f2.file_field :image, :class => 'form-control' %>
+          <% end %>
+          <%= f2.hidden_field :id %>
+        </div>
+      <% end %>
+    </div>
+
+
+
+
+  <% else %>
+
+
+
+
+    <% unless @product.dl.exists? %>
+      <div class="form-group">
+        <%= f.label :num_stock, "Stock count" %><br />
+        <%= f.text_field :num_stock %>
+        Sold: <%= @product.num_sold %>  Locked: <%= @product.num_locked %>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+      <%= f.label :cents %><br />
+      <%= f.number_field :cents, :class => 'xform-control' %> 
+    </div>
+
+    <div class="well"> 
+      <div class="form-group">
+        <%= f.label :dl, "Digital Download (PDF only)" %>
+        <%= f.file_field :dl, :class => 'form-control' %>
+      </div>
+      <% if @product.dl.exists? %>
+        <p class="text-primary">ACHTUNG! There is an existing digital download: <%= @product.dl_file_name %>. Uploading will replace this file.</p>
+      <% end %>
+    </div>
+
+
+
+
+  <% end %>
+
+
+
+
+
+  <%= f.submit 'Save Changes', :class => 'btn btn-success' %>
+
+<% end %>
+

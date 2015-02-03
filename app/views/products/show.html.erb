@@ -1,0 +1,92 @@
+<style>
+.product-name      {margin: 0 0 22px;}
+form .form-control {margin-bottom: 1em;}
+.field_with_errors {background: #FDD;}
+.image             {width: 100%; border: 1px solid #fff; box-shadow: -3px -6px 80px -10px rgba(0,0,0,0.2) inset; float: left; max-height: 302px;}
+.image img         {max-height: 300px; margin: 0 auto; display: block; z-index: -5; position: relative; max-width: 100%;}
+.variant           {border: 1px solid #AAA; display: inline-block; padding: 0.2em 0.6em; margin: 0.2em 0.1em;}
+span.variant       {font-weight: bold;}
+.img-thumbnail     {max-height: 50px; margin: 2px 1px;}
+</style>
+
+<% @root = @product.root %>
+
+<%= form_for @order, :url => order_product_url(@product), :html => {:role => :form} do |f| %>
+  <div class="row">
+    <div class="col-md-5" id="images">
+      <% imgs = @root.all_images %>
+      <div class="image">
+        <%= image_tag imgs[0].url(:medium), :id => 'main_image' %>
+      </div>
+      <% imgs.each do |img| %>
+        <%= link_to image_tag(img.url(:thumb), :class => 'img-thumbnail'), img.url(:medium) %>
+      <% end %>
+    </div>
+    <script>
+      var pimg, mel = $('#main_image');
+      function setimg(url) {pimg = mel.attr('src'); mel.attr('src', url);}
+      function resimg() {if(pimg) mel.attr('src', pimg);}
+      $('#images a').on('click', function() {pimg = null; return false;});
+      $('#images a').on('mouseover', function() {
+        setimg($(this).attr('href')); 
+        //$(this).one('mouseout', resimg);
+        return false;
+      });
+    </script>
+
+    <div class="col-md-6" style="margin-bottom: 1em;">
+      <h2 class="product-name"><%= @root.name %></h2>
+      <%= (@root.desc.blank? ? @root.short_desc : @root.desc).html_safe rescue '' %> 
+      <% if @order.errors.any? %>
+         <strong style="color: #C00;"><%= @order.errors.full_messages.join(' ') %></strong>
+      <% end %>
+
+      <%= f.hidden_field :product_id %>
+      <% 
+        rc   = @root.children 
+        type = (@order.is_dd? ? "digital download" : "style")
+        type = "select a #{type}:" if @product.root?
+      %>
+      <%= f.label :product_id, type, :class => (@product.root? ? "text-danger" : nil) %><br />
+      <% unless @product.root? %>
+        <span class="variant bg-info"><%= "#{@product.name} (#{local_price(@product)})" %></span>
+        <%= link_to 'change', @root unless rc.size == 1 %>
+      <% else %>
+        <% rc.each do |p| %>
+          <span style="display: inline-block; min-width: 9em;"><%= link_to p.name, p, :class => "xvariant" %></span>
+          <% if p.num_left < 1 %>
+            <span style="color: #C00;">Sold out!</span>
+          <% else %>
+            <span class="text-muted" style="color: #CCC;"><%= local_price(p) %></span>
+          <% end %>
+          <br />
+        <% end %>
+      <% end %>
+      <br /><br />
+
+    <% if @order.product.priced? %>
+      <div class="row">
+      <div class="col-md-6">
+        <% unless @order.is_dd? %>
+          <%= f.label     :address,      "ship to" %>
+          <%= f.text_area :address, :rows => 3, :cols => 22, :placeholder => "Satoshi Nakamoto\n1101 Cipher St\nBlacksburg, VA", :class => 'form-control' %>
+          <%= f.label     :shipping_id,  "shipping" %>
+          <%= f.select    :shipping_id,  Hash[Shipping.all.map{|s| ["#{s.name.downcase} (#{local_price(s)})", s.id]}], {:include_blank => false}, {:class => 'form-control'} %>
+          <%= f.submit   "Pay with Bit#{session[:asset]} &rarr;".html_safe, :class => 'btn btn-primary btn-lg' %>
+        <% else %>
+          <%= f.button "#{local_price(@product, true)} &rarr;".html_safe, :type => 'submit', :class => 'btn btn-primary btn-lg' %>
+        <% end %>
+        <% if session[:asset] == 'USD' %>
+          <br />
+          <br />
+          <%= link_to "What is BitUSD?", "http://whatisbitusd.com/", :class => 'small', :rel => 'nofollow' %>
+        <% end %>
+      </div>
+      </div>
+    <% end %>
+
+    </div>
+
+    <%# link_to "Edit", edit_product_url(@product) %>
+  </div>
+<% end %>

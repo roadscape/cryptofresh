@@ -1,0 +1,22 @@
+<h1>Edit Product</h1>
+
+<hr />
+
+<%
+  def list(parent_id = nil)
+    out = []
+    Product.where(:parent_id => parent_id).each do |h|
+      link  = link_to_unless @product == h, h.name, edit_product_url(h)
+      stock = h.num_stock ? "#{h.num_stock}ct" : ""
+      sold  = h.num_sold == 0 ? "" : " - sold #{h.num_sold}"
+      out << "#{link} #{stock} #{sold} #{list h.id}"
+    end
+    "<ul><li>#{out.join('</li><li>')}</li></ul>" unless out.size == 0
+  end
+%>
+
+<div style="float: right;">
+  <%= list.html_safe %>
+</div>
+
+<%= render :partial => 'form' %>

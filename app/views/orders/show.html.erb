@@ -1,0 +1,97 @@
+<div class="row">
+
+  <div class="col-sm-3">
+    <div style="text-align: center;">
+      <%= image_tag @order.product.root.image(:medium), :class => 'img-thumbnail-old', :style => "max-height: 240px; max-width: 190px;" %>
+    </div>
+  </div>
+
+  <div class="col-sm-8" style="margin-bottom: 1em;">
+    <h2><%= @order.product.root.name %> <small><%= @order.product.name %></small></h2>
+  </div>
+
+  <div class="col-sm-6">
+    <div class="alert bg-info">
+      <p class="lead" style="min-height: 80px;">
+        <%= image_tag '/cashier.jpg', :class => 'pull-left img-thumbnail', :style => "max-height: 120px; margin-right: 16px;" %>
+          To complete your order,
+          send <code><%= @order.amount.short.gsub(' ', '&nbsp;').html_safe %></code> 
+          to <code><%= Wallet::ACCT %></code> with 
+          memo&nbsp;<code><%= @order.pub_id %></code>.
+      </p>
+      <p class="clearfix" style="padding-topx: 22px;">
+        <%= link_to 'Pay with BitShares client', @order.bts_url, :class => 'btn btn-primary pull-right', :id => 'pay_button' %>
+        <span id="timeleft" class="btn disabled pull-right"></span>
+      </p>
+    </div>
+
+    <div class="alert well">
+      <p>
+        <% if @order.shipping %>
+          <div id="ship_alert" class="text-muted">
+          Item will be shipped to: <br />
+          <%= @order.address.gsub(/[\r\n]+/, ", ") %>, 
+          <%= @order.shipping.name %> <%= local_price(@order.shipping) %>
+          </div>
+        <% else %>
+          <div id="dl_alert" class="text-muted">Your download will begin within 10 seconds of payment.</div>
+        <% end %>
+      </p>
+    </div>
+
+
+  </div>
+</div>
+
+
+<script>
+  var isdone = false;
+  var expires = new Date();
+  expires.setSeconds(expires.getSeconds() + <%= (@order.due_at - DateTime.now).seconds %>);
+
+  function notify_dl(url) {
+    isdone = true;
+    $('#pay_button').hide();
+    if(url != '') $('#dl_alert').html('Thank you! If your download did not start automatically, <a href="'+url+'">try again</a>');
+    else $('#dl_alert').html('Expired!');
+    <%= "if(url != '') window.location = url;".html_safe unless @order.paid_at %>
+    $('#timeleft').html("This order will now self-destruct."); 
+  }
+  
+  function notify_ship() {
+    done('');
+    $('#ship_alert').html("Thank you for your order! It will be shipping soon!");
+  }
+
+  $(document).ready(function() {
+
+    var cd = setInterval(function(){ 
+      var seconds = (expires - (new Date()).getTime())/1000;
+      if(seconds > 0 && !isdone) {
+        var minutes = Math.floor(seconds / 60)
+        seconds = Math.floor(seconds % 60)
+        $('#timeleft').html((minutes > 0 ? minutes + "m " : "") + seconds + "s remaining"); 
+      } else {
+        clearInterval(cd)
+        if(!isdone) done('');
+      }
+    }, 1000);
+ 
+    function poll(){
+       if(isdone) return;
+       //console.log("Polling..");
+       setTimeout(function(){
+          $.getScript("<%= status_order_url(@order.pub_id) %>")
+            .done(function( script, textStatus ) {
+              //console.log( textStatus );
+              poll();
+            })
+            .fail(function( jqxhr, settings, exception ) {
+              alert("Could not contact server. Please refresh the page.");
+              //console.log(exception);
+          });
+      }, 5000);
+    } //)();
+    poll();
+  });
+</script>
