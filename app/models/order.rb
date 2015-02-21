@@ -26,6 +26,10 @@ class Order < ActiveRecord::Base
     !paid? && (due_at < DateTime.now)
   end
 
+  def stale?
+    paid? ? paid_at < 1.day.ago : expired?
+  end
+
   def paid?
     !paid_at.nil?
   end

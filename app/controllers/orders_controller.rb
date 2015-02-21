@@ -3,7 +3,7 @@ class OrdersController < ApplicationController
   before_filter :load_order
 
   def show
-    render 'expired' if @order.expired?
+    render 'stale' if @order.stale?
   end
 
   def status
@@ -20,9 +20,9 @@ class OrdersController < ApplicationController
   end
 
   def download
-    raise "Order is too far expired" if @order.due_at < 12.hours.ago
-    raise "Order has not been paid"  unless @order.paid?
-    raise "Order is not a download"  unless @order.is_dd?
+    raise "Order is stale"    if @order.stale?
+    raise "Order is not paid" unless @order.paid?
+    raise "Not downloadable"  unless @order.is_dd?
 
     p = @order.product
     send_file p.dl.path,
