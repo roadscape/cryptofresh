@@ -26,15 +26,14 @@
     </div>
 
     <div class="alert well">
-      <p>
+      <p id="status_alert" class="text-muted">
         <% if @order.shipping %>
-          <div id="ship_alert" class="text-muted">
           Item will be shipped to: <br />
           <%= @order.address.gsub(/[\r\n]+/, ", ") %>, 
-          <%= @order.shipping.name %> <%= local_price(@order.shipping) %>
-          </div>
+          <%= @order.shipping.name %> 
+          <%= local_price(@order.shipping) %>
         <% else %>
-          <div id="dl_alert" class="text-muted">Your download will begin within 10 seconds of payment.</div>
+          Your download will begin within 10 seconds of payment.
         <% end %>
       </p>
     </div>
@@ -47,51 +46,64 @@
 <script>
   var isdone = false;
   var expires = new Date();
-  expires.setSeconds(expires.getSeconds() + <%= (@order.due_at - DateTime.now).seconds %>);
+  <% seconds = (@order.due_at - DateTime.now).seconds %>
+  expires.setSeconds(expires.getSeconds() + <%= seconds %>);
 
   function notify_dl(url) {
+    _done('Thank you! If your download did not start automatically, <a href="'+url+'">try again</a>');
+    <%= "if(url != '') window.location = url;".html_safe unless @order.paid_at %>
+  }
+
+  function notify_ship() {
+    _done("Thank you for your order! It will be shipping soon!");
+  }
+
+  function notify_expired() {
+    _done('Expired!');
+  }
+
+  // Received a message; stop polling.
+  function _done(status_html) {
+    if(isdone) return;
     isdone = true;
     $('#pay_button').hide();
-    if(url != '') $('#dl_alert').html('Thank you! If your download did not start automatically, <a href="'+url+'">try again</a>');
-    else $('#dl_alert').html('Expired!');
-    <%= "if(url != '') window.location = url;".html_safe unless @order.paid_at %>
     $('#timeleft').html("This order will now self-destruct."); 
-  }
-  
-  function notify_ship() {
-    done('');
-    $('#ship_alert').html("Thank you for your order! It will be shipping soon!");
+    $('#status_alert').html(status_html);
   }
 
   $(document).ready(function() {
 
-    var cd = setInterval(function(){ 
-      var seconds = (expires - (new Date()).getTime())/1000;
-      if(seconds > 0 && !isdone) {
-        var minutes = Math.floor(seconds / 60)
-        seconds = Math.floor(seconds % 60)
-        $('#timeleft').html((minutes > 0 ? minutes + "m " : "") + seconds + "s remaining"); 
-      } else {
-        clearInterval(cd)
-        if(!isdone) done('');
+    <%# Update the countdown once a second %>
+    <% if seconds > 0 %>
+    var countdown = setInterval(function(){ 
+      if(isdone) {
+        clearInterval(countdown); 
+        return;
       }
+
+      var seconds = (expires - (new Date()).getTime()) / 1000;
+      if(seconds <= 0) {
+        notify_expired();
+        return;
+      }
+
+      var m = Math.floor(seconds / 60),
+          s = Math.floor(seconds % 60);
+      $('#timeleft').html( (m > 0 ? m + "m " : "") + s + "s remaining" ); 
     }, 1000);
- 
-    function poll(){
-       if(isdone) return;
-       //console.log("Polling..");
-       setTimeout(function(){
-          $.getScript("<%= status_order_url(@order.pub_id) %>")
-            .done(function( script, textStatus ) {
-              //console.log( textStatus );
-              poll();
-            })
-            .fail(function( jqxhr, settings, exception ) {
-              alert("Could not contact server. Please refresh the page.");
-              //console.log(exception);
-          });
+    <% end %>
+
+    <%# Poll the server every 5 seconds %> 
+    function poll() {
+      if(isdone) return;
+      setTimeout(function(){
+        $.getScript("<%= status_order_url(@order.pub_id) %>")
+         .done(function( script, textStatus ) {poll();})
+         .fail(function( jqxhr, settings, exception ) {
+           alert("Could not contact server. Please refresh the page.");});
       }, 5000);
-    } //)();
+    }
     poll();
+
   });
 </script>
