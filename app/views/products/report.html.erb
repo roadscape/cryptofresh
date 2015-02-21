@@ -1,15 +1,17 @@
+<style>
+.fee {float: right; color: #CCC; font-size: 0.9em; padding-left: 3px;}
+</style>
+
 <h3>Transactions</h3>
-<table class="table table-bordered" style="font-size: 9pt;">
+<table class="table table-bordered" style="font-size: 9pt; width: auto;">
   <tr>
     <td>trx</td>
     <td>block</td>
     <td>date</td>
-    <td>amount</td>
+    <td>amount <span class="fee">fee</span></td>
     <td align="center">from &rarr; to</td>
     <td>status</td>
     <td>memo</td>
-    <td>tx fee</td>
-    <td>expires</td>
   </tr>
 
 <% 
@@ -30,14 +32,17 @@ Tx.all.sort_by{|tx| tx.block_num}.reverse.each do |tx|
     <td><%= tx['trx_id'][0..8] %></td>
     <td><%= tx['block_num'] %></td>
     <td><%= tx['date'] %></td>
-    <td><%= Amount.from_bts(tx['amount']).short %></td>
+    <td>
+      <span class="fee">
+        <%= Amount.from_bts(tx['fee']).short %>
+      </span>
+      <%= Amount.from_bts(tx['amount']).short %>
+    </td>
     <td align="right"><%= "#{tx['from'].gsub('cashier as cashier', 'cashier')} &rarr; #{tx['to']}".gsub(Wallet::ACCT, "<strong>\\0</strong>").html_safe %></td>
     <% memo = tx['memo'] %>
     <% memo = o ? memo.gsub(o.pub_id, "<strong style=\"color: #080; font-weight: normal;\">\\0</strong>") : "#{memo} <strong style=\"color: #C00;\"></strong>" %>
     <td align="center"><%= (paid ? "<strong style=\"color: #080;\">PAID</strong>" : "<strong style=\"color: #C00; font-weight: normal;\">invalid</strong>").html_safe %>
     <td><%= memo.html_safe %></td>
-    <td><%= Amount.from_bts(tx['fee']).short %></td>
-    <td><%= tx['expires'] %></td>
   </tr>
 
 <% end %>
