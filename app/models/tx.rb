@@ -21,30 +21,41 @@ class Tx < ActiveRecord::Base
     self.json = hash.to_json
   end
 
+  # This method is really paranoid and will hopefully break right away
+  #   if any of my assumptions about the API interface are broken.
   def ledger_entries
     tx = raw
+
+    # Delete keys that have expected values.
     raise "UNHANDLED CASE" unless tx.delete("is_market")        == false
     raise "UNHANDLED CASE" unless tx.delete("is_market_cancel") == false
     raise "UNHANDLED CASE" unless tx.delete("is_virtual")       == false
     raise "UNHANDLED CASE" unless tx.delete("error")            == nil
     raise "UNHANDLED CASE" unless tx.delete("is_confirmed")     == true
 
-    tx['date']    = bts_date(tx.delete('timestamp'))
-    tx['expires'] = bts_date(tx.delete('expiration_timestamp'))
-    tx['fee']     = tx['fee']
-    entries       = tx.delete("ledger_entries")
-    unhandled     = tx.keys - %w{trx_id block_num date expires fee}
-    raise "Unhandled keys: #{unhandled.join(', ')} -- #{tx.inspect}" if unhandled.any?
+    # Clean up the keys. Build a minimal hash of reference data.
+    ref = {
+      'date'      => bts_date(tx.delete('timestamp')),
+      'expires'   => bts_date(tx.delete('expiration_timestamp')),
+      'fee'       => tx.delete('fee'),
+      'trx_id'    => tx.delete('trx_id'),
+      'block_num' => tx.delete('block_num')}
+
+    # The only remaining key is removed. The hash should be empty!
+    entries = tx.delete("ledger_entries")
+    raise "Unhandled keys! #{tx.inspect} -- ref: #{ref}" if tx.keys.any?
+
+    # TODO: Another assumption. Have not yet seen more than 1 entry in a tx.
     raise "Multiple ledger entries" if entries.size != 1
 
-    out = []
-    entries.each do |e|
+    # Append the minimal hash of data to each ledger entry
+    # TODO: Document and sanity-check the structure of ledger_entries
+    entries.map do |e|
       e.delete('running_balances')
       e['from'] = e.delete('from_account')
       e['to']   = e.delete('to_account')
-      out << tx.merge(e) #unless e['from'] == e['to']
+      ref.merge(e)
     end
-    out
   end
 
 private
