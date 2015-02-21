@@ -5,3 +5,4 @@ rpc_pass:
 admin_user: 
 admin_pass: 
 secret_phrase: 
+ga_pub_id: 
