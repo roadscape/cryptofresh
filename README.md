@@ -19,6 +19,8 @@ Webstore accepting BitAsset payments.
 
 ### Todo
 
+- Check wallet is responding and blockchain is current. Disable the store otherwise.
 - Change floats to BigDecimal
+- Categories (enable STI on products table)
 - "Refund" button
 - Accept partial payments?

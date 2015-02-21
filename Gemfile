@@ -1,11 +1,16 @@
 source 'https://rubygems.org'
 
 
+# Cryptofresh
+
 gem 'rails', '4.1.6'
 gem 'mysql2'
 gem 'paperclip'
-
 gem 'bootstrap-sass'
+gem 'unicorn'
+
+
+# Defaults below
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
@@ -31,4 +36,3 @@ gem 'spring',        group: :development
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-gem 'unicorn'
