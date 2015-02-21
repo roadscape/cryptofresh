@@ -18,7 +18,7 @@
 
 ids = Hash[Order.all.map{|o| [o.pub_id, o]}]
 Tx.all.sort_by{|tx| tx.block_num}.reverse.each do |tx| 
-  tx = Wallet.clean_tx(JSON.parse(tx.json)).first
+  tx = tx.ledger_entries.first
   id = ids.keys.find{|i| tx['memo'].include?(i)}
   o  = id ? ids[id] : nil
   status = case
@@ -86,7 +86,7 @@ Tx.all.sort_by{|tx| tx.block_num}.reverse.each do |tx|
       <%= status %>
     </td>
     <% tx = Tx.where(:trx_id => o.trx_id).first %>
-    <td><%= (tx ? Wallet.clean_tx(JSON::parse(tx.json)).first['from'] : '') %></td>
+    <td><%= (tx ? tx.ledger_entries.first['from'] : '') %></td>
     <td><%= o.created_at.strftime("%Y-%m-%d %H:%M") %></td>
     <td><%= h(o.address).gsub("\n","<br />").html_safe %></td>
     <td><small><%= o.ip %></small><br /><%= o.referrer_acct %></td>
