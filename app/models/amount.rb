@@ -35,7 +35,8 @@ class Amount
   # Add another amount e.g. 0.49 + 0.49 --> 0.98
   def add new_amount
     raise "Symbol mismatch" unless @symbol == new_amount.symbol
-    Amount.new(@amount.to_f + new_amount.amount.to_f, @symbol)
+    dec = NICE_DECIMALS[@symbol.downcase.to_sym]
+    Amount.new(BigDecimal.new(@amount, dec) + BigDecimal.new(new_amount.amount, dec), @symbol)
   end
 
   # Does this amount COVER the other?
@@ -85,8 +86,7 @@ private
     raise("Don't know precision for #{asset}") unless dec
 
     # Truncate the amount, e.g.  $1.001 -> $1.01
-    pow = 10**dec
-    num = (amount.amount * pow).ceil.to_f / pow
+    num = BigDecimal.new(amount.amount.to_s).ceil(dec)
 
     # Round the number to certain thresholds
     nice_num = case
@@ -115,6 +115,6 @@ private
   #   87,    5,    1        89
   #  213,   50,    0        250
   def round amount, precision, notch = 0
-    num = (amount / precision).ceil * precision - notch
+    (amount / precision).ceil * precision - notch
   end
 end
