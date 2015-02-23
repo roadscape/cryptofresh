@@ -6,16 +6,21 @@
   def list(parent_id = nil)
     out = []
     Product.where(:parent_id => parent_id).order('position').each do |h|
-      link  = link_to_unless @product == h, h.name, edit_product_url(h)
-      stock = h.num_stock ? "#{h.num_stock}ct" : ""
-      sold  = h.num_sold == 0 ? "" : " - sold #{h.num_sold}"
-      out << "#{link} #{stock} #{sold} #{list h.id}"
+      link = link_to_unless(@product == h, h.name, edit_product_url(h))
+      sold = case
+        when h.num_stock    then "#{h.num_sold} of #{h.num_stock}"
+        when h.num_sold > 0 then "#{h.num_sold}"
+        else ""
+      end
+      out << "<li><div class=\"pull-right\">#{sold}</div> #{link} #{list h.id}</li>"
     end
-    "<ul><li>#{out.join('</li><li>')}</li></ul>" unless out.size == 0
+    "<ul>#{out.join}</ul>" unless out.size == 0
   end
 %>
 
-<div style="float: right;">
+<div class="pull-right">
+  <div class="pull-right">Sold</div>
+  <div style="clear: both;"></div>
   <%= list.html_safe %>
 </div>
 
