@@ -21,6 +21,7 @@ class Product < ActiveRecord::Base
 
   accepts_nested_attributes_for :photos, :reject_if => lambda { |t| t['image'].blank? }, :allow_destroy => true
 
+  #self.inheritance_column = :node_type
 
   def num_sold
     orders.select{|o| o.paid?}.size

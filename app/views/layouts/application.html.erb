@@ -78,6 +78,13 @@ span.asset       {opacity: 1; box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75); bord
   </div>
   <script>var i = 0, inv = setInterval(function(){$('#tag span').toggleClass('inv'); if(i++ >6) clearInterval(inv)}, 700);</script>
 
+  <% pct = BitShares::API::Misc.get_info['blockchain_average_delegate_participation'].to_i %>
+  <% if pct < 51 %>
+    <div class="alert alert-danger">
+      Warning: Delegate participation rate is <%= pct %>%. <strong>Sales are temporarily unavailable.</strong>
+    </div>
+  <% end %>
+
   <%= yield %>
 
   <hr>
@@ -90,6 +97,9 @@ span.asset       {opacity: 1; box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75); bord
 </div>
 
 <%= render :partial => 'common/ga' %>
+
+
+
 
 </body>
 </html>

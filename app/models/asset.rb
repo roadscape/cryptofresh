@@ -16,7 +16,7 @@ class Asset
       when from == to    then 1.0
       when from == 'BTS' then feed(to)
       when to   == 'BTS' then 1 / feed(from)
-      else feed(to) / feed(from)
+      else feed(to).to_f / feed(from).to_f
     end
   end
 

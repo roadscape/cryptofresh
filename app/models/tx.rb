@@ -46,7 +46,7 @@ class Tx < ActiveRecord::Base
     raise "Unhandled keys! #{tx.inspect} -- ref: #{ref}" if tx.keys.any?
 
     # TODO: Another assumption. Have not yet seen more than 1 entry in a tx.
-    raise "Multiple ledger entries" if entries.size != 1
+    #raise "Multiple ledger entries in trx #{ref['trx_id']}\n#{entries.inspect}" if entries.size != 1
 
     # Append the minimal hash of data to each ledger entry
     # TODO: Document and sanity-check the structure of ledger_entries
