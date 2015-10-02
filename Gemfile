@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 
 gem 'rails',       '4.2.4'
 gem 'web-console', '~> 2.0'
-gem 'mysql2'
+gem 'mysql2',      '~> 0.3.18'
 gem 'paperclip'
 gem 'bootstrap-sass'
 gem 'unicorn'
