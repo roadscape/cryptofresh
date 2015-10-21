@@ -9,9 +9,11 @@
       <code id="tag"># tangible assets for the blockchain age. <span class="inv">&nbsp;</span>&nbsp;</code>
     <% end %>
     <a id="fl" href="/"></a>
-    <div id="delegate" style="font-size: 1.5em; position: absolute; top: 10px; right: 10px;">
-      <span class="label label-danger label-lg">DEV</span>
-    </div>
+    <% if STORE['app_env'] == 'dev' %>
+      <div id="delegate" style="font-size: 1.5em; position: absolute; top: 10px; right: 10px;">
+        <span class="label label-danger label-lg">DEV</span>
+      </div>
+    <% end %>
   </div>
   <script>var i = 0, inv = setInterval(function(){$('#tag span').toggleClass('inv'); if(i++ >6) clearInterval(inv)}, 700);</script>
 

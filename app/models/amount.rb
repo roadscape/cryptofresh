@@ -6,7 +6,7 @@ class Amount
 
   def self.asset id
     @asset = {} unless @asset
-    @asset[id] ||= Graphene::API::RPC.instance.get_asset(id)
+    @asset[id] ||= (legacy_asset(id) || Graphene::API::RPC.instance.get_asset(id))
   end
 
   def self.cent c
@@ -117,4 +117,19 @@ private
   def round amount, precision, notch = 0
     (amount / precision).ceil * precision - notch
   end
+
+  # Legacy adapter! Returns mock object for legacy assets from BTS 0.9.x
+  def self.legacy_asset id
+    map = {
+      0  => ['BTS',    5],
+      22 => ['USD',    4],
+      14 => ['CNY',    4],
+      7  => ['GOLD',   6],
+      6  => ['SILVER', 4],
+      21 => ['EUR',    4]}
+
+    {'symbol' => map[id][0], 'precision' => map[id][1]} if map[id]
+  end
+
+
 end

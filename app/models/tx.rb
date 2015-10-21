@@ -29,6 +29,8 @@ class Tx < ActiveRecord::Base
   def ledger_entry
     tx = raw
 
+    return ledger_entry_legacy if legacy?
+
     memo  = tx.delete('memo')
     desc  = tx.delete('description')
     opx   = tx.delete('op')
@@ -66,4 +68,28 @@ private
   def bts_date ts
     DateTime.parse(ts).to_time.localtime("-06:00").strftime("%Y-%m-%d %H:%M:%S")
   end
+
+  def legacy?
+    !raw['is_market'].nil?
+  end
+
+  # Legacy adapter! Any BTS 0.9x transactions are fed thru here.
+  def ledger_entry_legacy
+    tx = raw
+
+    # warn that we threw away ledger entries [1..-1] (rare. ok for legacy compat)
+    multi = (tx['ledger_entries'].size != 1)
+    note  = " #{multi ? '[WARN]' : ''}[LEGACY]"
+
+    { 'date'      => bts_date(tx['timestamp']),
+      'expires'   => bts_date(tx['expiration_timestamp']),
+      'fee'       => tx['fee'],
+      'trx_id'    => tx['trx_id'],
+      'block_num' => tx['block_num'],
+      'from'      => tx['ledger_entries'][0]['from_account'],
+      'to'        => tx['ledger_entries'][0]['to_account'],
+      'amount'    => tx['ledger_entries'][0]['amount'],
+      'memo'      => tx['ledger_entries'][0]['memo'] + note }
+  end
+
 end
