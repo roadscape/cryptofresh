@@ -2,6 +2,8 @@ class OrdersController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_filter :load_order
 
+  layout 'fresh'
+
   def show
     render 'stale' if @order.stale?
   end

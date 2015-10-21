@@ -6,7 +6,7 @@ class Amount
 
   def self.asset id
     @asset = {} unless @asset
-    @asset[id] ||= BitShares::API::Blockchain.get_asset(id)
+    @asset[id] ||= Graphene::API::RPC.instance.get_asset(id)
   end
 
   def self.cent c
@@ -15,7 +15,7 @@ class Amount
 
   def self.from_bts arr
     a = asset(arr['asset_id'])
-    Amount.new(arr['amount'].to_f / a['precision'], a['symbol'])
+    Amount.new(arr['amount'].to_f / 10**a['precision'], a['symbol'])
   end
 
   # Amount.new(1.99, "USD")
@@ -73,7 +73,7 @@ class Amount
   end
 
   def bts_amount
-    (@amount.to_f * Amount.asset(@symbol)['precision']).to_i
+    (@amount.to_f * 10**Amount.asset(@symbol)['precision']).to_i
   end
 
 

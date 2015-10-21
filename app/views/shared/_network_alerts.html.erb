@@ -1,0 +1,6 @@
+  <% pct =  Graphene::API::RPC.instance.info['participation'].to_i %>
+  <% if pct < 80 %>
+    <div class="alert alert-danger">
+      Warning: Delegate participation rate is <%= pct %>%. <strong>Sales are temporarily unavailable.</strong>
+    </div>
+  <% end %>

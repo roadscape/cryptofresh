@@ -1,0 +1,17 @@
+  <% cls = (params[:controller] == 'products' && params[:action] == 'index') ? "" : " mini" %>
+  <% cls = "" if (params[:controller] == 'nodes' && params[:action] == 'root') %>
+  <% cls = "" if @node && @node.root? && params[:action] == 'view' %>
+  <div class="jumbotron<%= cls %>" id="launch">
+    <a href="/" id="logo">cryptofresh</a>
+    <% if params[:controller] == 'products' %>
+      <code id="tag"># tangible assets for the blockchain age. <span class="inv">&nbsp;</span>&nbsp;</code>
+    <% else %>
+      <code id="tag"># tangible assets for the blockchain age. <span class="inv">&nbsp;</span>&nbsp;</code>
+    <% end %>
+    <a id="fl" href="/"></a>
+    <div id="delegate" style="font-size: 1.5em; position: absolute; top: 10px; right: 10px;">
+      <span class="label label-danger label-lg">DEV</span>
+    </div>
+  </div>
+  <script>var i = 0, inv = setInterval(function(){$('#tag span').toggleClass('inv'); if(i++ >6) clearInterval(inv)}, 700);</script>
+

@@ -1,0 +1,6 @@
+<% ['USD', 'CNY', 'GOLD', 'SILVER', 'EUR'].each do |asset| %>
+  <% classes = "asset bts-bg-#{asset.downcase}" %>
+  <% name = "<span class=\"ico\"></span><span class=\"lbl\">#{asset == 'BTS' ? 'BTS' : 'Bit'+asset}</span>".html_safe %>
+  <%= link_to_unless(asset == session[:asset], name, "?asset=#{asset}", :class => classes){"<span class=\"#{classes}\">#{name}</span>".html_safe} %>
+<% end %>
+<span class="text-muted">proudly accepted <!-- 自豪地接受。--></span>

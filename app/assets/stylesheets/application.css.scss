@@ -1,8 +1,41 @@
-/*
- * ...boilerplate application.css.scss comments
- *= require_tree .                                                              
- *= require_self                                                                
- */                                                                             
 @import "bootstrap-sprockets";
 @import 'bootstrap';
 
+header           {padding: 15px 0 10px;}
+header .text-muted {font-style: italic; font-size: 15px; color: #AAA;}
+footer           {padding: 0 2em 1.5em; color: #AAA; text-align: left;}
+#delegate {text-align: right; jfloat: right;}
+#delegate a       {float: ight; font-size: 12px; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; opacity: 0.9;}
+#delegate a:hover  {opacity: 1;}
+#launch          {border-radius: 10px; box-shadow: inset 0 0 20px rgba(0,0,0,0.25); margin-bottom: 20px; position: relative; margin: 1% 0 2%;}
+#launch          {background: #5e7598 url(/launch3.jpg) 0 0; padding: 5% 0 4%;}
+#launch.mini     {padding: 0.2% 0; margin: 2% 0 3%;}
+#launch.mini #logo {line-height: 80%;}
+#launch.mini #fl {opacity: 0.5;}
+#launch.mini #tag {xbackground-color: rgba(249,242,244,0.5); opacity: 0.8;}
+#launch #fl      {position: absolute; width: 100%; height: 100%; top: 0; left: 0; background: url(/bts-white-sm.png) 98% 93% no-repeat;}
+#logo, #tag      {display: inline-block; vertical-align: middle;}
+#logo            {font-size: 57px; margin: 0.25em 0 0.25em 0.55em; border-right: 4px solid white; padding-right: 0.4em; color: rgba(255,255,255,0.9);}
+#tag             {background-color: rgba(249,242,244,0.7); color: #080; font-size: 23px; padding-left: 10px; margin-left: 1.3em;}
+#tag .inv        {color: #ccc; background: #383;}
+
+.asset           {padding: 3px; color: white !important; display: inline-block; font-size: 14px; border-radius: 3px; margin-right: 12px; letter-spacing: 0.05em; min-width: 100px;}
+.asset .ico      {display: inline-block; width: 22px; height: 24px; background: url(/bts-22x24.png); vertical-align: middle; margin-right: 6px; border-radius: 2px;}
+.asset .lbl      {display: inline-block; vertical-align: middle;}
+a.asset          {opacity: 0.43; border: 1px solid #888; text-decoration: none;}
+a.asset:hover,
+span.asset       {opacity: 1; box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75); border: 1px solid #555;}
+
+.bts-bg-usd      {background-color: #9bc63f;}
+.bts-bg-cny      {background-color: #d6595e;}
+.bts-bg-gold     {background-color: #d2bd43;}
+.bts-bg-silver   {background-color: #a1b4b7;}
+.bts-bg-eur      {background-color: #398abe;}
+.bts-bg-bts      {background-color: #3ba4db;}
+
+.bts-text-usd    {color: #9bc63f;}
+.bts-text-cny    {color: #d6595e;}
+.bts-text-gold   {color: #d2bd43;}
+.bts-text-silver {color: #a1b4b7;}
+.bts-text-eur    {color: #398abe;}
+.bts-text-bts    {color: #3ba4db;}

@@ -5,9 +5,11 @@ class Wallet
   def self.scan
     # Get all ledger entries that transfer to our cashier account
     entries = []
-    BitShares::API::Wallet.account_transaction_history.each do |tx_data|
+
+    Graphene::API::RPC.instance.get_account_history(ACCT, 100000).each do |tx_data|
       tx = Tx.cache(tx_data)
-      entries += tx.ledger_entries.select{|f| f['to'] == ACCT && f['from'] != ACCT}
+      entry = tx.ledger_entry
+      entries << entry if entry['to'] == ACCT && entry['from'] != ACCT
     end
 
     # For each tx, find the matching unpaid order, and check it pays in full

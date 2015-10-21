@@ -26,7 +26,7 @@ private
       @price = {}
       @last  = DateTime.now
     end
-    @price[asset] ||= BitShares::API::Blockchain.median_feed_price asset rescue raise("Asset `#{asset}` ERROR")
+    @price[asset] ||= Graphene::API::RPC.instance.median_feed_price asset #rescue raise("Asset `#{asset}` ERROR")
   end
 
 end
